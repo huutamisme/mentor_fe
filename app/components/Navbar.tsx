@@ -17,12 +17,6 @@ const navItem: NavItem[] = [
     { name: "Hỗ trợ", href: "/support" },
 ]
 
-const mobileNavItem: NavItem[] = [
-    ...navItem,
-    { name: "Đăng nhập", href: "/login" },
-    { name: "Đăng ký", href: "/signup" },
-]
-
 const Navbar: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathName = usePathname();
