@@ -19,6 +19,15 @@ const schema = z.object({
 
 const Signup: React.FC = () => {
 
+    type FormData = z.infer<typeof schema>;
+    const onSubmit = (data: FormData) => {
+        const { username } = data;
+
+        localStorage.setItem("username", username);
+
+        router.push("/");
+    };
+
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(schema)
     });
@@ -50,7 +59,7 @@ const Signup: React.FC = () => {
                         </button>
                     </p>
 
-                    <form className="flex flex-col gap-4 mb-4" onSubmit={handleSubmit(console.log)}>
+                    <form className="flex flex-col gap-4 mb-4" onSubmit={handleSubmit(onSubmit)}>
                         <input
                             {...register("username")}
                             type="text"
