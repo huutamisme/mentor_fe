@@ -1,12 +1,28 @@
 "use client";
 
 import Image from "next/image";
-import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+    username: z.string().min(3, "Username must be at least 3 characters"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"]
+});
 
 const Signup: React.FC = () => {
+
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: zodResolver(schema)
+    });
+
     const [isSignUp, setIsSignUp] = useState(false);
     const router = useRouter();
 
@@ -33,12 +49,34 @@ const Signup: React.FC = () => {
                             Log In
                         </button>
                     </p>
-                    <button className="flex items-center justify-start w-full p-3 bg-red-500 text-white mb-4 hover:bg-red-600 transition">
-                        <FaGoogle className="mr-16 text-2xl" /> Sign up with Google
-                    </button>
-                    <button className="flex items-center justify-start w-full p-3 bg-blue-600 text-white mb-4 hover:bg-blue-700 transition">
-                        <FaFacebook className="mr-16 text-2xl" /> Sign up with Facebook
-                    </button>
+
+                    <form className="flex flex-col gap-4 mb-4" onSubmit={handleSubmit(console.log)}>
+                        <input
+                            {...register("username")}
+                            type="text"
+                            placeholder="Username"
+                            className="w-full py-3 px-4 bg-backround border border-black text-black hover:bg-gray-100 transition"
+                        />
+                        <p className="text-red-600">{errors.username?.message}</p>
+
+                        <input
+                            {...register("password")}
+                            type="password"
+                            placeholder="Password"
+                            className="w-full py-3 px-4 bg-backround border border-black text-black hover:bg-gray-100 transition"
+                        />
+                        <p className="text-red-600">{errors.password?.message}</p>
+
+                        <input
+                            {...register("confirmPassword")}
+                            type="password"
+                            placeholder="Confirm Password"
+                            className="w-full py-3 px-4 bg-backround border border-black text-black hover:bg-gray-100 transition"
+                        />
+                        <p className="text-red-600">{errors.confirmPassword?.message}</p>
+                        <button type="submit" className="w-full py-3 px-4 bg-background text-black border border-black hover:bg-blue-400 hover:border-blue-500">Submit</button>
+                    </form>
+
                     {/* Divider */}
                     <div className="relative flex py-3 items-center mb-4">
                         <div className="flex-grow border-t border-gray-300"></div>
