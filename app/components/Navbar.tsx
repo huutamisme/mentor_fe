@@ -1,8 +1,8 @@
 "use client";
 import Link from 'next/link';
 import { FaSearch } from 'react-icons/fa';
-import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 
 interface NavItem {
@@ -26,6 +26,17 @@ const mobileNavItem: NavItem[] = [
 const Navbar: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathName = usePathname();
+
+    const [username, setUsername] = useState<string | null>(null);
+    useEffect(() => {
+        const storedUser = localStorage.getItem('username');
+        if (storedUser) setUsername(storedUser);
+    }, [])
+
+    const handleLogout = () => {
+        localStorage.removeItem('username');
+        setUsername(null);
+    };
 
     const handleLinkClick = () => {
         setIsMenuOpen(false);
@@ -63,15 +74,26 @@ const Navbar: React.FC = () => {
                     </span>
                 </div>
 
-                {/* Login-Signup buttons */}
-                <div className="hidden lg:flex space-x-2">
-                    <Link href="/login">
-                        <p className="btn text-customBlue bg-white rounded-2xl">Đăng nhập</p>
-                    </Link>
-                    <Link href="/signup">
-                        <p className="btn text-white bg-customBlue rounded-2xl">Đăng ký</p>
-                    </Link>
-                </div>
+                {/* Login-Signup buttons or Greeting user */}
+                {username ? (
+                    <div className="hidden lg:flex items-center space-x-2">
+                        <p className="font-semibold">
+                            Xin chào, {username}!
+                        </p>
+                        <button className="btn text-customBlue bg-white rounded-2xl" onClick={handleLogout}>
+                            Đăng xuất
+                        </button>
+                    </div>
+                ) : (
+                    <div className="hidden lg:flex space-x-2">
+                        <Link href="/login">
+                            <p className="btn text-customBlue bg-white rounded-2xl">Đăng nhập</p>
+                        </Link>
+                        <Link href="/signup">
+                            <p className="btn text-white bg-customBlue rounded-2xl">Đăng ký</p>
+                        </Link>
+                    </div>
+                )}
 
                 {/* Hamburger button */}
                 <div className="lg:hidden">
@@ -102,18 +124,47 @@ const Navbar: React.FC = () => {
             {isMenuOpen && (
                 <div className="lg:hidden absolute top-16 left-0 w-full bg-base-100 shadow-lg z-50">
                     <ul className="space-y-2 font-semibold flex flex-col p-4 text-customBlue">
-                        {mobileNavItem.map((item, index) => (
+                        {navItem.map((item, index) => (
                             <li key={index}>
                                 <Link
                                     href={item.href}
-                                    passHref
-                                    className={`btn btn-ghost text-2xl ${pathName === item.href || (item.href === '/services' && pathName.startsWith('/services/')) ? 'underline' : ''}`}
+                                    className={`btn btn-ghost text-2xl ${pathName === item.href ||
+                                        (item.href === '/services' && pathName.startsWith('/services/')) ?
+                                        'underline' : ''}`}
                                     onClick={handleLinkClick}
                                 >
                                     {item.name}
                                 </Link>
                             </li>
                         ))}
+
+                        {username ? (
+                            <li>
+                                <button
+                                    onClick={() => {
+                                        localStorage.removeItem("username");
+                                        setUsername(null);
+                                        handleLinkClick();
+                                    }}
+                                    className="btn text-white bg-red-500 text-2xl w-full"
+                                >
+                                    Đăng xuất
+                                </button>
+                            </li>
+                        ) : (
+                            <>
+                                <li>
+                                    <Link href="/login" onClick={handleLinkClick} className="btn btn-ghost text-2xl">
+                                        Đăng nhập
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link href="/signup" onClick={handleLinkClick} className="btn btn-ghost text-2xl">
+                                        Đăng ký
+                                    </Link>
+                                </li>
+                            </>
+                        )}
                     </ul>
                 </div>
             )}
